@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>صح أم خطأ؟ حرف ت</title>
+  <style>
+    :root {
+      --purple: #7654d9;
+      --pink: #ff6fae;
+      --yellow: #ffd85e;
+      --mint: #78dfc1;
+      --ink: #332b59;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 18px;
+      color: var(--ink);
+      font-family: Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 12%, #ffe994 0 7%, transparent 7.5%),
+        radial-gradient(circle at 92% 18%, #ffb5d2 0 8%, transparent 8.5%),
+        linear-gradient(135deg, #d9f7ee, #e9ddff 55%, #fff1d2);
+    }
+
+    button { font: inherit; }
+
+    .game {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      padding: clamp(18px, 4vw, 36px);
+      border: 5px solid white;
+      border-radius: 30px;
+      background: rgba(255, 253, 248, .97);
+      box-shadow: 0 18px 50px #4f3d8030;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--purple);
+      font-size: clamp(2rem, 6vw, 3rem);
+    }
+
+    .letter {
+      display: inline-grid;
+      width: 48px;
+      height: 48px;
+      margin-inline: 3px;
+      place-items: center;
+      border-radius: 15px;
+      color: white;
+      background: var(--pink);
+      font-size: 2rem;
+      transform: rotate(-5deg);
+    }
+
+    .subtitle { margin: 8px 0 20px; }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #f0ebff;
+      font-weight: bold;
+    }
+
+    .progress {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: 470px;
+      margin: 16px auto;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #ded8eb;
+    }
+
+    .dot.current { background: var(--pink); transform: scale(1.3); }
+    .dot.done { background: #54c9a5; }
+
+    .question-card {
+      margin: 20px 0;
+      padding: clamp(20px, 5vw, 36px) 14px;
+      border: 3px dashed #d6c9ff;
+      border-radius: 24px;
+      background: #fbf8ff;
+    }
+
+    .prompt {
+      margin: 0 0 22px;
+      color: #665c7d;
+      font-size: 1.15rem;
+    }
+
+    .word {
+      display: grid;
+      min-height: 110px;
+      margin: 0 auto 22px;
+      place-items: center;
+      color: var(--purple);
+      font-size: clamp(2.8rem, 11vw, 4.7rem);
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .timer-row {
+      display: flex;
+      justify-content: space-between;
+      max-width: 430px;
+      margin: 0 auto 8px;
+      color: #665c7d;
+      font-weight: bold;
+    }
+
+    .timer-track {
+      max-width: 430px;
+      height: 13px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e9e3f2;
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #78dfc1, #ffd85e, #ff6fae);
+      transition: width .1s linear;
+    }
+
+    .answers {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .answer-button, .action {
+      min-width: 135px;
+      min-height: 58px;
+      padding: 12px 22px;
+      border: 0;
+      border-radius: 18px;
+      color: white;
+      cursor: pointer;
+      font-size: 1.25rem;
+      font-weight: bold;
+      transition: transform .15s, filter .15s;
+    }
+
+    .answer-button:hover:not(:disabled), .action:hover {
+      filter: brightness(1.06);
+      transform: translateY(-2px);
+    }
+
+    .answer-button:active:not(:disabled) { transform: translateY(2px); }
+
+    .true-button {
+      background: #44bd96;
+      box-shadow: 0 5px 0 #319776;
+    }
+
+    .false-button {
+      background: var(--pink);
+      box-shadow: 0 5px 0 #d94d8a;
+    }
+
+    button:disabled { opacity: .6; cursor: not-allowed; }
+
+    .message {
+      min-height: 30px;
+      margin: 16px 0 0;
+      color: var(--purple);
+      font-weight: bold;
+    }
+
+    .result {
+      padding: 24px 12px;
+      border-radius: 24px;
+      background: #f5f0ff;
+    }
+
+    .result h2 {
+      color: var(--purple);
+      font-size: 2rem;
+    }
+
+    .final-score {
+      color: #e84c91;
+      font-size: 2.2rem;
+      font-weight: bold;
+    }
+
+    .action {
+      border-radius: 999px;
+      background: var(--purple);
+      box-shadow: 0 5px 0 #5940ae;
+    }
+
+    .help {
+      margin: 16px 0 0;
+      color: #746b86;
+      font-size: .9rem;
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 480px) {
+      body { padding: 8px; }
+      .game { padding: 18px 12px; border-radius: 23px; }
+      .topline { justify-content: center; }
+      .badge { font-size: .92rem; }
+      .answer-button { min-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <h1>صح أم خطأ؟ <span class="letter">ت</span></h1>
+    <p class="subtitle">اقرأ الكلمة، ثم اختر إجابتك! 🌟</p>
+
+    <section id="quiz">
+      <div class="topline">
+        <div class="badge" id="questionNumber"></div>
+        <div class="badge">الرصيد: <span id="score">٠</span> نقطة</div>
+      </div>
+
+      <div class="progress" id="progress" aria-label="التقدم في الأسئلة"></div>
+
+      <div class="question-card">
+        <p class="prompt">هل تحتوي هذه الكلمة على حرف ت؟</p>
+        <div class="word" id="word" aria-live="polite"></div>
+
+        <div class="timer-row">
+          <span>الوقت المتبقي</span>
+          <span><span id="seconds">١٠</span> ثوانٍ</span>
+        </div>
+
+        <div class="timer-track" aria-hidden="true">
+          <div class="timer-bar" id="timerBar"></div>
+        </div>
+      </div>
+
+      <div class="answers">
+        <button class="answer-button true-button" id="trueButton" type="button">
+          ✅ صح
+        </button>
+        <button class="answer-button false-button" id="falseButton" type="button">
+          ❌ خطأ
+        </button>
+      </div>
+
+      <p class="message" id="message" aria-live="polite"></p>
+      <p class="help">اختر «صح» إذا وجدت حرف ت في الكلمة، وإلا اختر «خطأ».</p>
+    </section>
+
+    <section class="result" id="result" hidden aria-live="polite">
+      <h2>أحسنت! انتهت اللعبة 🎉</h2>
+      <p>رصيدك النهائي:</p>
+      <p class="final-score"><span id="finalScore">٠</span> من ٢٠ نقطة</p>
+      <button class="action" id="restartButton" type="button">العب مرة أخرى 🔄</button>
+    </section>
+  </main>
+
+  <script>
+    // hasTa: true تعني أن الكلمة تحتوي حرف ت، وfalse تعني أنها لا تحتويه.
+    const questions = [
+      { word: "تفاح", hasTa: true },
+      { word: "قمر", hasTa: false },
+      { word: "كتاب", hasTa: true },
+      { word: "وردة", hasTa: false },
+      { word: "بيت", hasTa: true },
+      { word: "أسد", hasTa: false },
+      { word: "مفتاح", hasTa: true },
+      { word: "سماء", hasTa: false },
+      { word: "تمر", hasTa: true },
+      { word: "مدرسة", hasTa: false },
+      { word: "حوت", hasTa: true },
+      { word: "قلم", hasTa: false },
+      { word: "تاج", hasTa: true },
+      { word: "بحر", hasTa: false },
+      { word: "مكتب", hasTa: true },
+      { word: "زهرة", hasTa: false },
+      { word: "بنت", hasTa: true },
+      { word: "شمس", hasTa: false },
+      { word: "فستان", hasTa: true },
+      { word: "باب", hasTa: false }
+    ];
+
+    const QUESTION_TIME = 10_000;
+
+    const quiz = document.getElementById("quiz");
+    const result = document.getElementById("result");
+    const questionNumber = document.getElementById("questionNumber");
+    const wordElement = document.getElementById("word");
+    const scoreElement = document.getElementById("score");
+    const secondsElement = document.getElementById("seconds");
+    const timerBar = document.getElementById("timerBar");
+    const message = document.getElementById("message");
+    const trueButton = document.getElementById("trueButton");
+    const falseButton = document.getElementById("falseButton");
+    const restartButton = document.getElementById("restartButton");
+    const progress = document.getElementById("progress");
+
+    let questionIndex = 0;
+    let score = 0;
+    let questionStartedAt = 0;
+    let timerInterval = null;
+    let advanceTimeout = null;
+    let answered = false;
+    let gameFinished = false;
+
+    const dots = questions.map((_, index) => {
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      dot.setAttribute("aria-label", `السؤال ${index + 1}`);
+      progress.appendChild(dot);
+      return dot;
+    });
+
+    function arabicNumber(number) {
+      return new Intl.NumberFormat("ar").format(number);
+    }
+
+    function playNotes(notes) {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        playNotes.context ||= new AudioContextClass();
+        const context = playNotes.context;
+        if (context.state === "suspended") context.resume();
+
+        notes.forEach(([frequency, start, duration]) => {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+
+          oscillator.type = "sine";
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(0.001, context.currentTime + start);
+          gain.gain.linearRampToValueAtTime(0.1, context.currentTime + start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            context.currentTime + start + duration
+          );
+
+          oscillator.connect(gain);
+          gain.connect(context.destination);
+          oscillator.start(context.currentTime + start);
+          oscillator.stop(context.currentTime + start + duration);
+        });
+      } catch (_) {
+        // تستمر اللعبة حتى إن لم تتوفر الأصوات في المتصفح.
+      }
+    }
+
+    function showQuestion() {
+      if (questionIndex >= questions.length) {
+        finishGame();
+        return;
+      }
+
+      answered = false;
+      const question = questions[questionIndex];
+
+      questionNumber.textContent =
+        `السؤال ${arabicNumber(questionIndex + 1)} من ${arabicNumber(questions.length)}`;
+      wordElement.textContent = question.word;
+      scoreElement.textContent = arabicNumber(score);
+      message.textContent = "هل تحتوي الكلمة على حرف ت؟";
+      trueButton.disabled = false;
+      falseButton.disabled = false;
+
+      dots.forEach((dot, index) => {
+        dot.classList.toggle("current", index === questionIndex);
+        dot.classList.toggle("done", index < questionIndex);
+      });
+
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      clearTimeout(advanceTimeout);
+
+      questionStartedAt = Date.now();
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 100);
+    }
+
+    function updateTimer() {
+      if (gameFinished) return;
+
+      const elapsed = Date.now() - questionStartedAt;
+      const remaining = Math.max(0, QUESTION_TIME - elapsed);
+
+      secondsElement.textContent = arabicNumber(Math.ceil(remaining / 1000));
+      timerBar.style.width = `${(remaining / QUESTION_TIME) * 100}%`;
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        trueButton.disabled = true;
+        falseButton.disabled = true;
+
+        if (!answered) {
+          answered = true;
+          message.textContent = "انتهى الوقت! لم تُضف نقطة هذه المرة ⏰";
+          playNotes([[260, 0, 0.18]]);
+        }
+
+        advanceTimeout = setTimeout(() => {
+          questionIndex++;
+          showQuestion();
+        }, 900);
+      }
+    }
+
+    function chooseAnswer(userSaysHasTa) {
+      if (answered || gameFinished) return;
+
+      answered = true;
+      clearInterval(timerInterval);
+      trueButton.disabled = true;
+      falseButton.disabled = true;
+
+      const correct = questions[questionIndex].hasTa === userSaysHasTa;
+
+      if (correct) {
+        score++;
+        scoreElement.textContent = arabicNumber(score);
+        message.textContent = "إجابة صحيحة! أضفنا نقطة إلى رصيدك ⭐";
+        playNotes([[523, 0, 0.12], [659, 0.12, 0.13], [784, 0.25, 0.18]]);
+      } else {
+        message.textContent = "ليست الإجابة الصحيحة، واصل المحاولة! 💪";
+        playNotes([[330, 0, 0.16], [260, 0.15, 0.18]]);
+      }
+
+      advanceTimeout = setTimeout(() => {
+        questionIndex++;
+        showQuestion();
+      }, 1100);
+    }
+
+    function finishGame() {
+      gameFinished = true;
+      clearInterval(timerInterval);
+      clearTimeout(advanceTimeout);
+
+      quiz.hidden = true;
+      result.hidden = false;
+      document.getElementById("finalScore").textContent = arabicNumber(score);
+      playNotes([[523, 0, 0.14], [659, 0.14, 0.14], [784, 0.28, 0.18], [1047, 0.46, 0.3]]);
+    }
+
+    trueButton.addEventListener("click", () => chooseAnswer(true));
+    falseButton.addEventListener("click", () => chooseAnswer(false));
+
+    restartButton.addEventListener("click", () => {
+      clearInterval(timerInterval);
+      clearTimeout(advanceTimeout);
+
+      questionIndex = 0;
+      score = 0;
+      answered = false;
+      gameFinished = false;
+      quiz.hidden = false;
+      result.hidden = true;
+      showQuestion();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "ArrowRight") chooseAnswer(true);
+      if (event.key === "ArrowLeft") chooseAnswer(false);
+    });
+
+    showQuestion();
+  </script>
+</body>
+</html>
